@@ -3,12 +3,14 @@
 ## Assignment 1
 
 Implement the Izhikevic model of spiking neurons. The model is described by the following differential equations:
-$$
-\begin{align*}
-\frac{du}{dt} &= 0.04u^2 + 5u + 140 - w + I \\
-\frac{dw}{dt} &= a(bu - w)
-\end{align*}
-$$
+```math
+\begin{cases}\dfrac{du}{dt} = 0.04u^2 + 5u + 140 - w + I \\
+
+\dfrac{dw}{dt} = a(bu - w)  \end{cases}
+```
+
+
+
 where 
 - $u$ is the membrane potential,
 - $w$ is the recovery variable,
