@@ -1,7 +1,6 @@
 .idea
 LAB1/dataset
-
 LAB1/Izhikevich_features.ipynb
 LAB1/Modified_LSM.ipynb
-
 LAB2/dataset
+.venv
