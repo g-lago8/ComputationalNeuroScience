@@ -18,6 +18,8 @@ class TDNN(nn.Module):
         return None
     
 
+
+
 if __name__=='__main__':
     tdnn=TDNN(input_size=1, hidden_size=2, window_size=2, output_size=1)
     input = torch.ones(1,100)
