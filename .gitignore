@@ -9,3 +9,4 @@
 *.csv
 LAB1/Modified_LSM.ipynb
 LAB1/Izhikevich_features.ipynb
+**/models/

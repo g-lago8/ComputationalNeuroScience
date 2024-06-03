@@ -1,7 +1,7 @@
 # CNS assignments
 
 ## Assignment 1
-### Izhikevic Model
+### Izhikevic Model 
 Implement the Izhikevic model of spiking neurons. The model is described by the following differential equations:
 ```math
 \begin{cases}\dfrac{du}{dt} = 0.04u^2 + 5u + 140 - w + I \\
@@ -43,4 +43,11 @@ In this assignment are implemented
 - basic Hebbian update
 - Oja rule
 - Subtractive Normalization
--
+### Assignment 2.2 Hopfield Network 
+
+## Assignment 3
+### Assignment 3.1 TDNN and RNN
+### Assignment 3.2. ESN
+###  Bonus 1: Mackey Glass
+### Bonus 2: seqMnist
+### Bonus 3: CharRNN 
