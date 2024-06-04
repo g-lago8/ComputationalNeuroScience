@@ -41,16 +41,28 @@ class EchoStateNetwork():
                 orthogonal_matrix_leakage='identity',
                 head=None) -> None:
         # initialize the weights
-        self.W_x = random_matrix(hidden_size, input_size, density)
-        self.W_h = random_matrix(hidden_size, hidden_size, density)
+        if density<1:
+            self.W_x = random_matrix(hidden_size, input_size, density)
+            self.W_h = random_matrix(hidden_size, hidden_size, density)
+        else:
+            self.W_x = np.random.uniform(-1, 1, (hidden_size, input_size))
+            self.W_h = np.random.uniform(-1, 1, (hidden_size, hidden_size))
         # initialize the hidden state and bias
+    
         self.last_h = np.zeros([hidden_size, 1])
-        self.bias = np.zeros_like(self.last_h) # TODO: implement more initialization strategies
+        self.bias = np.ones_like(self.last_h) # TODO: implement more initialization strategies
         # initialize weights at stability
-        norm_W_x = sparse.linalg.norm(self.W_x)
-        self.W_x *= omega_x / norm_W_x
-        rho = max(abs(np.linalg.eigvals(self.W_h.toarray())))
-        self.W_h *= rho_h/rho
+        if density<1:
+            norm_W_x = sparse.linalg.norm(self.W_x)
+            self.W_x *= omega_x / norm_W_x
+            rho = max(abs(np.linalg.eigvals(self.W_h.toarray())))
+            self.W_h *= rho_h/rho
+        else:
+            norm_W_x = np.linalg.norm(self.W_x)
+            self.W_x *= omega_x / norm_W_x
+            rho = max(abs(np.linalg.eigvals(self.W_h)))
+            self.W_h *= rho_h/rho
+        # create the head
         self.head=head
         # create the orthogonal matrix for the leakage part
         if isinstance(orthogonal_matrix_leakage, str): # random, identity, cycle
@@ -77,9 +89,8 @@ class EchoStateNetwork():
         else:
             raise ValueError("Unknown orthogonal matrix leakage type")
     
-    def create_reservoir(self, X, alpha_leak = 1.0):
+    def create_reservoir(self, X, alpha_leak):
         self.hidden_states=[]
-        self.last_h = np.zeros([self.W_x.shape[0], 1])
         for x_i in X:
             x_i = x_i.reshape(-1,1) # FIXME: only works for 1D input
             self.last_h= alpha_leak * tanh(self.W_x.dot( x_i)  + self.W_h.dot(self.last_h) + self.bias) + (1-alpha_leak)* (np.matmul(self. Q,  self.last_h))
@@ -87,14 +98,14 @@ class EchoStateNetwork():
         self.hidden_states=np.stack( self.hidden_states, axis=0).squeeze()
         return self.hidden_states
 
-    def fit(self, X, y, washout =10):
+    def fit(self, X, y, washout =10, alpha_leak=1.0):
         """
             params:
             X: list of numpy arrays or numpy array of shape sequence_length x input_size
             y: labels of shape sequence_length x n_features
         """
         # create the reservoir
-        self.create_reservoir(X)
+        self.create_reservoir(X, alpha_leak=alpha_leak)
         #discard the washout
         self.hidden_states=self.hidden_states[washout:,:] 
         # print(self.hidden_states.shape)
@@ -139,10 +150,10 @@ class EchoStateNetwork():
             print("No head defined")
 
 
-    def predict(self, X):
+    def predict(self, X, alpha_leak=1.0):
         self.hidden_states=[]
         # create the reservoir
-        self.create_reservoir(X)
+        self.create_reservoir(X, alpha_leak=alpha_leak)
         
         y_pred = self.head.predict(self.hidden_states)
         return y_pred
